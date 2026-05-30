@@ -21,9 +21,6 @@ import java.awt.event.KeyEvent;
  */
 public class BasicKeyBinding extends JFrame {
 
-    /**
-     * Entry point.
-     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             BasicKeyBinding app = new BasicKeyBinding();
@@ -47,7 +44,7 @@ public class BasicKeyBinding extends JFrame {
         add(targetPanel);
 
         // Explicit visual dynamic help prompt initialized on the center layout
-        JLabel infoLabel = new JLabel("Press CTRL + G to turn green", JLabel.CENTER);
+        JLabel infoLabel = new JLabel("Press CTRL + G to turn green or CTRL + B to turn blue", JLabel.CENTER);
         infoLabel.setFont(new Font("Arial", Font.BOLD, 18));
         targetPanel.add(infoLabel, BorderLayout.CENTER);
 
@@ -55,9 +52,13 @@ public class BasicKeyBinding extends JFrame {
         KeyStroke ctrlGKey = KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_DOWN_MASK);
         KeyStroke ctrlBKey = KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_DOWN_MASK);
 
+        // Configuration for the ESCAPE key without any modifier masks
+        KeyStroke escKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+
         // Define unique action string token identifiers
         String greenToken = "changeColorToGreenAction";
         String blueToken = "changeColorToBlueAction";
+        String resetToken = "resetToGrayAction";
 
         // Retrieve core input and action maps bound to the focused window scope
         InputMap inputMap = targetPanel.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW);
@@ -66,13 +67,14 @@ public class BasicKeyBinding extends JFrame {
         // Pair the physical keystrokes with their corresponding abstract named tokens
         inputMap.put(ctrlGKey, greenToken);
         inputMap.put(ctrlBKey, blueToken);
+        inputMap.put(escKey, resetToken);
 
         // Bind the green string token to its execution behavior block
         actionMap.put(greenToken, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 targetPanel.setBackground(new ColorUIResource(0, 150, 0));
-                infoLabel.setText("Press CTRL + B to turn blue");
+                infoLabel.setText("Press CTRL + B to turn blue (or ESC to reset)");
                 infoLabel.setForeground(Color.WHITE);
             }
         });
@@ -82,8 +84,18 @@ public class BasicKeyBinding extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 targetPanel.setBackground(new ColorUIResource(0, 120, 170));
-                infoLabel.setText("Press CTRL + G to turn green");
+                infoLabel.setText("Press CTRL + G to turn green (or ESC to reset)");
                 infoLabel.setForeground(Color.WHITE);
+            }
+        });
+
+        // Bind the escape string token to reset the initial state properties
+        actionMap.put(resetToken, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                targetPanel.setBackground(Color.LIGHT_GRAY);
+                infoLabel.setText("Press CTRL + G to turn green or CTRL + B to turn blue");
+                infoLabel.setForeground(Color.BLACK);
             }
         });
     }
